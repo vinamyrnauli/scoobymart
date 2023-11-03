@@ -3,14 +3,14 @@
 <summary>📋Assignment 7</summary>
 
 ## **DAFTAR ISI**
-* [Implementasi *Checklist*](#a-perbedaan-utama-stateless-dan-stateful-widget-dalam-flutter)
-* [Bagan *Request-Response*](#b-penjelasan-widget-dan-fungsinya)
+* [Perbedaan *stateless* dan *stateful widget* dalam Flutter](#a-perbedaan-utama-stateless-dan-stateful-widget-dalam-flutter)
+* [Penjelasan *Widget* dan Fungsinya](#b-penjelasan-widget-dan-fungsinya)
 * [Implementasi *Checklist*](#c-implementasi-checklist-part-1)
 * [BONUS](#d-bonus-part-1)
 <hr>
 
 
-## **A. Perbedaan Utama *stateless* dan *stateful widget* dalam Flutter**
+## **A. Perbedaan Utama *stateless* dan *stateful Widget* dalam Konteks Pengembangan Aplikasi Flutter**
 | *Stateless Widget* | *Stateful Widget* |
 | --- | --- |
 | *Widget* statis | *Widget* dinamis |
