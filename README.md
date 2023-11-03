@@ -1,7 +1,6 @@
 ## 📖**ASSIGNMENTS PBP**📖
 <details>
 <summary>📋Assignment 7</summary>
-</details>
 
 ## **DAFTAR ISI**
 * [Implementasi *Checklist*](#a-perbedaan-utama-stateless-dan-stateful-widget-dalam-flutter)
@@ -254,3 +253,4 @@ class ShopCard extends StatelessWidget {
 ## **D. BONUS Part 1**
 Berikut adalah bukti bahwa saya mengimplementasikan warna-warna yang berbeda untuk setiap tombol (`Lihat Item`, `Tambah Item`, dan `Logout`) seperti berikut.
 ![BONUS](/img/bonus1.jpg)
+</details>
