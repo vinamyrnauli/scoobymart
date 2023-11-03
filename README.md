@@ -3,7 +3,7 @@
 <summary>📋Assignment 7</summary>
 
 ## **DAFTAR ISI**
-* [Perbedaan *stateless* dan *stateful widget* dalam Flutter](#a-perbedaan-utama-stateless-dan-stateful-widget-dalam-flutter)
+* [Perbedaan *stateless* dan *stateful widget* dalam Flutter](#a-perbedaan-utama-stateless-dan-stateful-widget-dalam-konteks-pengembangan-aplikasi-flutter)
 * [Penjelasan *Widget* dan Fungsinya](#b-penjelasan-widget-dan-fungsinya)
 * [Implementasi *Checklist*](#c-implementasi-checklist-part-1)
 * [BONUS](#d-bonus-part-1)
