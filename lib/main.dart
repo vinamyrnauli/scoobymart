@@ -1,37 +1,33 @@
+// Importing necessary packages for Flutter and the 'menu.dart' screen
 import 'package:flutter/material.dart';
-import 'package:scoobymart/menu.dart';
+import 'package:scoobymart/screens/menu.dart';
 
+// The main entry point for the Flutter application
 void main() {
   runApp(const MyApp());
 }
 
+// The root widget of the Flutter application
 class MyApp extends StatelessWidget {
+  // Constructor for the 'MyApp' class
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // The 'build' method defines the structure of the application's UI
   @override
   Widget build(BuildContext context) {
+    // Creating a MaterialApp, which is the top-level container for the app
     return MaterialApp(
-      title: 'Flutter Demo',
+      // Setting the title of the application
+      title: 'Flutter PBP',
+      // Configuring the theme for the entire application
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
+        // Defining a color scheme with a seed color of 'Colors.indigo'
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+
+        // Enabling the use of Material 3 design principles
         useMaterial3: true,
       ),
+      // Setting the initial screen of the application to 'MyHomePage'
       home: MyHomePage(),
     );
   }
