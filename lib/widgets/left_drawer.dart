@@ -1,5 +1,6 @@
 // Importing necessary packages for Flutter and custom screens.
 import 'package:flutter/material.dart';
+import 'package:scoobymart/screens/list_item.dart';
 import 'package:scoobymart/screens/menu.dart';
 import 'package:scoobymart/screens/scoobymart_form.dart';
 import 'package:scoobymart/screens/scoobymart_show.dart';
@@ -71,16 +72,15 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
 
-          // ListTile for navigating to the 'Show Items' screen.
           ListTile(
-            leading: const Icon(Icons.add_shopping_cart),
+            leading: const Icon(Icons.shopping_basket),
             title: const Text('Show Items'),
             onTap: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ShowItem(),
-                  ));
+              // Route menu ke halaman produk
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProductPage()),
+              );
             },
           ),
         ],

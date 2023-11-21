@@ -30,19 +30,7 @@ class _ShowItemPage extends State<ShowItem> {
       drawer: const LeftDrawer(),
 
       // Building a ListView of items with a ListTile for each item.
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(items[index].name),
-            subtitle: Text(
-                "Price: ${items[index].price} \nDescription: ${items[index].description}"),
-            onTap: () {
-              // Action to be performed when a list item is tapped.
-            },
-          );
-        },
-      ),
+  
     );
   }
 }
