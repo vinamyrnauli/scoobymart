@@ -28,9 +28,6 @@ class _ShowItemPage extends State<ShowItem> {
 
       // Including the LeftDrawer widget for navigation.
       drawer: const LeftDrawer(),
-
-      // Building a ListView of items with a ListTile for each item.
-  
     );
   }
 }

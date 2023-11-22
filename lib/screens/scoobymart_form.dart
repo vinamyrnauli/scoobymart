@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:scoobymart/screens/menu.dart';
-// OK TODO: Impor drawer yang sudah dibuat sebelumnya
 import 'package:scoobymart/widgets/left_drawer.dart';
 import 'package:scoobymart/widgets/menu_card.dart';
 
@@ -28,10 +27,12 @@ class _ShopFormPageState extends State<ShopFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Accessing the CookieRequest provider
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
       appBar: AppBar(
+        // Setting the title of the app bar
         title: const Center(
           child: Text(
             'Add Item Form',
@@ -40,13 +41,14 @@ class _ShopFormPageState extends State<ShopFormPage> {
         backgroundColor: Colors.lightGreen,
         foregroundColor: Colors.white,
       ),
-      // OK TODO: Tambahkan drawer yang sudah dibuat di sini
+      // OK TODO: Add the previously created drawer here
       drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Text input for Item Name
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -70,6 +72,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 },
               ),
             ),
+            // Text input for Price
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -80,7 +83,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
-                // OK TODO: Tambahkan variabel yang sesuai
                 onChanged: (String? value) {
                   setState(() {
                     _price = int.parse(value!);
@@ -97,6 +99,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 },
               ),
             ),
+            // Text input for Description
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -109,7 +112,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 ),
                 onChanged: (String? value) {
                   setState(() {
-                    // OK TODO: Tambahkan variabel yang sesuai
                     _description = value!;
                   });
                 },
@@ -121,6 +123,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 },
               ),
             ),
+            // Save button
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -131,7 +134,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Kirim ke Django dan tunggu respons
+                      // Send data to Django and wait for response
                       final response = await request.postJson(
                           "http://127.0.0.1:8000/create-flutter/",
                           jsonEncode(<String, String>{
@@ -140,6 +143,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                             'description': _description,
                           }));
                       if (response['status'] == 'success') {
+                        // Show success message and navigate to the home page
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(
                           content: Text("New item successfully saved!"),
@@ -149,6 +153,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                           MaterialPageRoute(builder: (context) => MyHomePage()),
                         );
                       } else {
+                        // Show error message if there is an issue
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(
                           content: Text("There is an error, please try again."),

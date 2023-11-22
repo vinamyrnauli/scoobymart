@@ -12,18 +12,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Creating a provider for CookieRequest
     return Provider(
       create: (_) {
+        // Creating an instance of CookieRequest
         CookieRequest request = CookieRequest();
         return request;
       },
+      // Defining the root MaterialApp
       child: MaterialApp(
-          title: 'Flutter App',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-            useMaterial3: true,
-          ),
-          home: const LoginPage()),
+        title: 'Flutter App',
+        // Setting the theme
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+          useMaterial3: true,
+        ),
+        // Setting the initial route to the LoginPage
+        home: const LoginPage(),
+      ),
     );
   }
 }

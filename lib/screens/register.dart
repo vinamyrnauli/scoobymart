@@ -1,47 +1,47 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
-// Importing necessary packages and files
-import 'package:scoobymart/screens/menu.dart';
-import 'package:scoobymart/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:scoobymart/screens/login.dart';
 
 // Main function to run the application
 void main() {
-  runApp(const LoginApp());
+  runApp(const RegisterApp());
 }
 
-// Main application widget
-class LoginApp extends StatelessWidget {
-  const LoginApp({super.key});
+// Main application widget for the register feature
+class RegisterApp extends StatelessWidget {
+  const RegisterApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Building the MaterialApp with the specified theme and initial route
     return MaterialApp(
-      title: 'Login',
+      title: 'Register',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.lightBlue,
       ),
-      home: const LoginPage(),
+      home: const RegisterPage(),
     );
   }
 }
 
-// LoginPage widget, which is a StatefulWidget
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+// RegisterPage widget, which is a StatefulWidget
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-// State class for the LoginPage widget
-class _LoginPageState extends State<LoginPage> {
+// State class for the RegisterPage widget
+class _RegisterPageState extends State<RegisterPage> {
   // Controllers for handling user input in text fields
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfirmationController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,10 @@ class _LoginPageState extends State<LoginPage> {
     // Building the main scaffold with app bar and body
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text(
+          'Register',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.lightBlue,
         foregroundColor: Colors.white,
       ),
@@ -66,6 +69,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _usernameController,
               decoration: const InputDecoration(
                 labelText: 'Username',
+                labelStyle: TextStyle(color: Colors.black),
               ),
             ),
             const SizedBox(height: 12.0),
@@ -74,44 +78,65 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               decoration: const InputDecoration(
                 labelText: 'Password',
+                labelStyle: TextStyle(color: Colors.black),
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 12.0),
+            // Text field for confirming the password (obscured)
+            TextField(
+              controller: _passwordConfirmationController,
+              decoration: const InputDecoration(
+                labelText: 'Confirm Password',
+                labelStyle: TextStyle(color: Colors.black),
               ),
               obscureText: true,
             ),
             const SizedBox(height: 24.0),
-            // Elevated button for initiating the login process
+            // Elevated button for initiating the registration process
             ElevatedButton(
               onPressed: () async {
                 // Extracting username and password from text fields
                 String username = _usernameController.text;
                 String password = _passwordController.text;
+                String passwordConfirmation =
+                    _passwordConfirmationController.text;
 
-                // Sending login request to Django backend
+                // Checking if password and confirmation match
+                if (password != passwordConfirmation) {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(const SnackBar(
+                        content: Text(
+                            "Register failed, password confirmation incorrect.")));
+                  return;
+                }
+                // Sending registration request to Django backend
                 final response =
-                    await request.login("http://127.0.0.1:8000/auth/login/", {
+                    await request.post("http://127.0.0.1:8000/auth/register/", {
                   'username': username,
                   'password': password,
                 });
 
-                // Handling the response based on login success or failure
-                if (request.loggedIn) {
+                // Handling the response based on registration success or failure
+                if (response['status']) {
                   String message = response['message'];
-                  String uname = response['username'];
-                  // Navigating to the home page on successful login
+
+                  // Navigating to the login page on successful registration
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
                   );
-                  // Showing a snackbar with a welcome message
+                  // Showing a snackbar with a success message
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                        SnackBar(content: Text("$message Welcome, $uname.")));
+                    ..showSnackBar(SnackBar(content: Text("$message")));
                 } else {
-                  // Showing an alert dialog on login failure
+                  // Showing an alert dialog on registration failure
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('Login Failed'),
+                      title: const Text('Register failed.'),
                       content: Text(response['message']),
                       actions: [
                         TextButton(
@@ -125,19 +150,8 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 }
               },
-              child: const Text('Login'),
-            ),
-            const SizedBox(height: 12.0),
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to Register Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RegisterPage()),
-                );
-              },
               child: const Text('Register'),
-            )
+            ),
           ],
         ),
       ),

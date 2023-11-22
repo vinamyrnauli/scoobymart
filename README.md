@@ -864,3 +864,423 @@ class _ShowItemPage extends State<ShowItem> {
 ## **F. BONUS Part 2**
 Bukti bahwa saya sudah mengimplementasikan bonus sudah ada pada bagian implementasi *checklist*.
 </details>
+
+<details>
+<summary>📋Assignment 9</summary>
+
+## **DAFTAR ISI**
+* [Pengambilan Data JSON](#a-penjelasan-pengambilan-data-json-dengan-membuat-model-dan-tidak)
+* [Fungsi CookieRequest dan Penjelasan *Instance* CookieRequest](#b-fungsi-cookierequest-dan-penjelasan-instance-cookierequest)
+* [Mekanisme Pengambilan Data](#c-mekanisme-pengambilan-data-dari-json-sampai-dapat-ditampilkan-di-flutter)
+* [Mekanisme Autentikasi](#d-mekanisme-autentikasi-dari-input-data-akun-flutter-ke-django-sampai-selesai-proses-autentikasi-oleh-django-dan-tampil-menu-di-flutter)
+* [Pemakaian *Widget* dan Fungsinya](#e-seluruh-widget-yang-dipakai-dan-penjelasan-fungsi-masing-masing)
+* [Implementasi *Checklist*](#f-implementasi-checklist-part-3)
+* [BONUS](#g-bonus-part-3)
+<hr>
+
+
+## **A. Penjelasan Pengambilan Data JSON dengan Membuat Model dan Tidak**
+Pengambilan data JSON tanpa membuat model itu dapat dilakukan. Pada Flutter, kita dapat menggunakan metode `json.decode` untuk mengurai *string* JSON menjadi objek `Map<String, dynamic>` dan mengakses *value* dengan menggunakan *keys*. 
+
+Namun, jika kita mengambil data JSON dengan membuat modelnya terlebih dahulu itu akan lebih unggul dan praktis. Kelas model dapat menyediakan berbagai tipe keamanan, validasi, dan keterbacaan untuk data JSON. Selain itu, dapat membantu terhindar dari kesalahan atau bug yang terjadi saat mengakses data JSON tanpa kelas model. 
+<br>
+
+*Source:*
+* https://stackoverflow.com/questions/75638056/how-to-parse-json-data-without-model-class-in-flutter-and-get-single-value
+* https://blog.logrocket.com/dihttps://stackoverflow.com/questions/68343117/json-request-without-model-binding-in-asp-net-core-webapi
+<br>
+
+## **B. Fungsi CookieRequest dan Penjelasan *Instance* CookieRequest**
+Fungsi CookieRequest adalah untuk menangani pengiriman dan penerimaan *cookie* dalam permintaan HTTP di Flutter. 
+
+*Instance* CookieRequest perlu dibagian ke semua komponen dalam Flutter karena *instance* tersebut menjaga objek *CookieJar* yang menyimpan semua *cookie* untuk domain dan jalur berbeda. Dengan berbagi *instance* CookieRequest yang sama, komponen yang berbeda dapat mengakses *cookie* yang sama dan menghindar pembuatan *cookie* konflik atau duplikat.
+<br>
+
+*Source:*
+* https://stackoverflow.com/questions/52500575/post-request-with-cookies-in-flutter
+* https://codewithflutter.com/how-do-i-make-an-http-request-using-cookies-on-flutter/
+<br>
+
+## **C. Mekanisme Pengambilan Data dari JSON sampai Dapat Ditampilkan di Flutter**
+1. Pertama, saya membuat file baru pada folder `lib/screens` dengan nama `list_item.dart` dan menjalankan perintah di terminal Flutter seperti berikut.
+```bash
+flutter pub add http
+```
+<br>
+
+2. Kedua, saya mengimpor *library* yang dibutuhkan di `list_item.dart` seperti berikut.
+```dart
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:scoobymart/models/item.dart';
+import 'package:scoobymart/screens/show_item.dart';
+import 'package:scoobymart/widgets/left_drawer.dart';
+```
+<br>
+
+3. Ketiga, saya membuat fungsi untuk mengambil data dari server dengan mengirimkan GET Request ke URL dengan potongan kode seperti berikut.
+```dart
+var url = Uri.parse('http://127.0.0.1:8000/get-product/');
+    var response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+```
+<br>
+
+4. Keempat, saya mengambil respons dari permintaan HRRP dengan mengkonversi *string* JSON seperti berikut.
+```dart
+  var data = jsonDecode(utf8.decode(response.bodyBytes));
+```
+<br>
+
+5. Kelima, saya membuat `list` bernama `listItem` untuk membuat objek *item* dengan menggunakan data JSON seperti berikut.
+```dart
+    List<Product> listItem = [];
+    for (var d in data) {
+      if (d != null) {
+        listItem.add(Product.fromJson(d));
+      }
+    }
+    return listItem;
+```
+<br>
+
+6. keenam, saya membuat halaman untuk menampilkan daftar *item* dan memberikan kemampuan navigasi ke halaman *detail item* ketika pengguna mengklik salah satu *item* dalam daftar dengan kode seperti berikut.
+```dart
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Items'),
+        backgroundColor: Colors.pink,
+        foregroundColor: Colors.white,
+      ),
+      drawer: const LeftDrawer(),
+      body: FutureBuilder(
+        future: fetchProduct(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (!snapshot.hasData) {
+              return const Column(
+                children: [
+                  Text(
+                    "No item data.",
+                    style: TextStyle(color: Color(0xff59A5D8), fontSize: 20),
+                  ),
+                  SizedBox(height: 8),
+                ],
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (_, index) => Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailProductPage(
+                              product: snapshot.data![index],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${snapshot.data![index].fields.name}",
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (index < snapshot.data!.length - 1) const Divider(),
+                  ],
+                ),
+              );
+            }
+          }
+        },
+      ),
+    );
+  }
+```
+<br>
+
+## **D. Mekanisme Autentikasi dari Input Data Akun Flutter ke Django sampai Selesai Proses Autentikasi oleh Django dan Tampil Menu di Flutter**
+1. Pertama, saya membuat metode *view* untuk login pada `authentication/views.py` seperti berikut.
+```python
+@csrf_exempt
+def login(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            auth_login(request, user)
+            # Status login sukses.
+            return JsonResponse({
+                "username": user.username,
+                "status": True,
+                "message": "Login sukses!"
+            }, status=200)
+        else:
+            return JsonResponse({
+                "status": False,
+                "message": "Login gagal, akun dinonaktifkan."
+            }, status=401)
+
+    else:
+        return JsonResponse({
+            "status": False,
+            "message": "Login gagal, periksa kembali email atau kata sandi."
+        }, status=401)
+```
+<br>
+
+2. Kedua, saya nenbuat file `urls.py` pada folder `authentication` dan menambahkan URL *routing* seperti berikut.
+```python
+from django.urls import path
+from authentication.views import login
+
+app_name = 'authentication'
+
+urlpatterns = [
+    path('login/', login, name='login'),
+]
+```
+<br>
+
+3. Ketiga, saya menambahkan `path('auth/', include('authentication.urls')),` pada file `shopping_list/urls.py`.
+<br>
+
+4. keempat, saya membuat file baru bernama `login.dart` di folder `screens`.
+<br>
+
+5. Kelima, saya menginstal *package* yang telah disediakan dan menjalankannya di terminal seperti berikut.
+```bash
+flutter pub add provider
+flutter pub add pbp_django_auth
+```
+<br>
+
+6. Keenam, saya mengubah `main.dart` saya menjadi seperti berikut.
+```dart
+import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:scoobymart/screens/login.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child: MaterialApp(
+        title: 'Flutter App',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+          useMaterial3: true,
+        ),
+        home: const LoginPage(),
+      ),
+    );
+  }
+}
+
+```
+<br>
+
+6. Terakhir, saya mengubah `home: MyHomePage()` menjadi `home: LoginPage()` pada `main.dart`.
+<br>
+
+## **E. Seluruh *Widget* yang Dipakai dan Penjelasan Fungsi Masing-Masing**
+| Nama *Widget* | Fungsi |
+| --- | --- |
+| `AppBar` | Untuk menampilkan bilah atas pada halaman, yaitu `ScoobyMart` |
+| `Scaffold` | Untuk kerangka utama dari halaman, yang mencakup `AppBar` dan `Body` |
+| `Column` | Untuk mengatur *widget-children* secara vertikal |
+| `SnackBar` | Untuk menampilkan pesan singkat yang muncul di bawah layar saat item toko diklik |
+| `ListView.Builder` | Untuk membuat daftar dengan elemen-elemen yang dibuat secara dinamis berdasarkan data atau model tertentu |
+| `TextField` | Untuk menginput teks dari *user* |
+| `Container` | Untuk mengelola tata letak dan konten dalam *card* |
+| `Navigator` | Untuk menavigasi ke halaman baru dan menggantikan halaman tersebut |
+| `FutureBuilder` | Untuk menangani proses pengembalian data yang bersifat asinkron, yaitu mengambil dan menampilkan data *item* dengan menunggu fungsi `fetchProduct()` |
+<br>
+
+## **F. Implementasi *Checklist* Part 3**
+#### Mengintegrasikan Sistem Autentikasi Django dengan Flutter
+1. Pertama, saya membuat `django-app` bernama `authentication` pada proyek Django `shopping_list`.
+<br>
+
+2. Lalu, saya menambahkan `authentication` ke `INSTALLED_APPS` pada *main project* `settings.py` Django.
+<br>
+
+3. Kemudian, saya menjalankan perintah `pip install django-cors-headers` untuk menginstal *library* yang dibutuhkan.
+<br>
+
+4. Lalu, saya menambahkan `corsheaders` ke `INSTALLED_APPS` pada *main project* `settings.py` Django.
+<br>
+
+5. Selanjutnya, saya menambahkan `corsheaders.middleware.CorsMiddleware` pada *main project* `settings.py` Django.
+<br>
+
+6. Lanjut, saya menambahkan beberapa variabel pada *main project* `settings.py` Django seperti berikut.
+```python
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+```
+<br>
+
+#### Membuat halaman Login pada Flutter
+1. Pertama, saya membuat metode *view* untuk login pada `authentication/views.py`.
+<br>
+
+2. Kedua, saya nenbuat file `urls.py` pada folder `authentication` dan menambahkan URL *routing*.
+<br>
+
+4. keempat, saya membuat file baru bernama `login.dart` di folder `screens`.
+<br>
+
+5. Kelima, saya menginstal *package* yang telah disediakan dan menjalankannya di terminal seperti berikut.
+```bash
+flutter pub add provider
+flutter pub add pbp_django_auth
+```
+<br>
+
+6. Keenam, saya memodifikasi `main.dart` saya dan mengubah `home: MyHomePage()` menjadi `home: LoginPage()`.
+<br>
+
+#### Membuat Model Kustom sesuai Django
+1. Pertama, saya membuka *endpoint* `JSON` yang sudah dibuat pada Tutorial 2.
+<br>
+
+2. Selanjutnya, saya menyalin data `JSON` dan membuka situs web Quicktype.
+<br>
+
+3. Pada situs tersebut, saya mengubah *setup name* menjadi `Product`, *source type* menjadi `JSON`, dan *language* menjadi `Dart`.
+<br>
+
+4. Lalu, saya menempelkan data JSON yang sudah disalin ke dalam *textbox* yang ada pada Quicktype.
+<br>
+
+5. Kemudian, saya mengklik pilihan `Copy Code` pada Quicktype.
+<br>
+
+6. Setelah mendapatkan kode model dari Quicktype, saya membuka proyek Flutter dan membuat file baru pada folder `lib/models` dengan nama `item.dart` dan menempelkan kode yang disalin dari Quicktype.
+<br>
+
+#### Membuat Halaman Berisi Detail *Item*
+1. Pertama, saya membuat file baru bernama `show_item.dart` yang ada di `lib/screens` seperti berikut.
+```dart
+import 'package:flutter/material.dart';
+import 'package:scoobymart/models/item.dart';
+
+class DetailProductPage extends StatelessWidget {
+  final Product product;
+  const DetailProductPage({Key? key, required this.product}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(product.fields.name),
+        backgroundColor: Colors.pink,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              product.fields.name,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text('Price: ${product.fields.price}'),
+            const SizedBox(height: 20),
+            Text('Description: ${product.fields.description}'),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        backgroundColor: Colors.pink,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.arrow_back),
+      ),
+    );
+  }
+}
+
+```
+<br>
+
+2. Kemudian, saya mengimpor `'package:scoobymart/screens/show_item.dart';` di file `list_item.dart` dan menambahkan beberapa kode yang mengarahkan ke `show_item.dart` dengan potongan kode seperti berikut.
+```dart
+return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (_, index) => Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailProductPage(
+                              product: snapshot.data![index],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+      ...
+),
+...
+```
+<br>
+
+3. Terakhir, saya melakukan `add`, `commit`, `push` pada repositori `scoobymart` di GitHub.
+<br>
+
+## **G. BONUS Part 3**
+Bonus sudah saya implementasikan sesuai ketentuan, yaitu membuat `register.dart` dan filter data *item* dari *user*.
+<br>
+</details>
